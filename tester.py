@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import numpy as np
 import gen_cutouts
 import fitter
@@ -9,7 +11,7 @@ import os
 
 
 def doone(xid, get_grid=True):
-    """ Run one full simulation: 
+    """ Run one full simulation:
     Generate an image, extract sources, fit them
     Arguments:
     seed -- integer
@@ -64,3 +66,7 @@ def doall(N, get_grid=True):
     pool.close()
     pool.join()
     return R1
+
+
+if __name__=="__main__":
+    doone(1, get_grid=True)
