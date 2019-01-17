@@ -70,7 +70,7 @@ def get_cutouts(sexcat, segmentation, image, var, bg, sourcelist, figs):
     # grab cutout for each source
     sources = []
     for source in sexcat:
-        print("source: {}".format(source['NUMBER']))
+        #print("source: {}".format(source['NUMBER']))
 
         if sourcelist is not None:
             # match to original source_list
