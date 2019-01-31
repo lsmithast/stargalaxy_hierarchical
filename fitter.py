@@ -451,7 +451,7 @@ def zeropad(psf, npix):
     return psfpad
 
 
-def fitextractions(grid, lprior, D, psf, get_grid=False):
+def fitextractions(grid, lprior, D, psf, get_grid=False, benchmark=False):
     """
     Fit the extracted cutouts and return either logodds or likelihood grid
     
@@ -471,6 +471,8 @@ def fitextractions(grid, lprior, D, psf, get_grid=False):
     get_grid: bool
         flag to switch between log-odds S/G vs 
         grid of likelihoods of stars and galactic models
+    benchmark: bool
+        turn on benchmarking, measure average time taken per source
     
     Returns:
     --------
@@ -482,17 +484,28 @@ def fitextractions(grid, lprior, D, psf, get_grid=False):
         of star or galaxy
 
     """
+    if benchmark:
+        import time
+    
     npix = grid.shape[2]
     grid1 = convolver(grid, psf)
     ret = []
     psfpad = zeropad(psf, npix)
-
+    
+    if benchmark:
+        start = time.time()
+    
     for j in range(len(D)):
         curd = D[j]
         ima, var = cutter(curd['cutout'], curd['var'],
                           curd['x'], curd['y'], npix)
         logodds = sg_prob(ima, var, psfpad, grid1, lprior, get_grid=get_grid)
         ret.append(logodds)
+    
+    if benchmark:
+        end = time.time()
+        print("%.2fms per source" % (((end - start)/len(D))*1000))
+    
     if get_grid:
         logstar = [_[0] for _ in ret]
         loggal = [_[1] for _ in ret]
