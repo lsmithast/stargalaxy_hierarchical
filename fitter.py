@@ -16,7 +16,7 @@ def gengrid(npix=129, minr=0.1, maxr=25, nr=21,
     Parameters:
     -----------
     npix: int
-        Integer size of the grid 
+        Integer size of the grid
     minr: float
         Minimium scale-length of the Sersic model (in ")
     maxr: float
@@ -35,10 +35,10 @@ def gengrid(npix=129, minr=0.1, maxr=25, nr=21,
     Returns:
     --------
     models: numpy array
-        The array of models with shape of (nr*nn, npix, npix) 
-        The 0-th axis is axis of models. 
+        The array of models with shape of (nr*nn, npix, npix)
+        The 0-th axis is axis of models.
         The fastest changing parameter is the Sersic index
-    
+
     """
     rads = np.exp(np.linspace(np.log(minr), np.log(maxr), nr, True))
     ns = np.linspace(minn, maxn, nn, True)
@@ -58,7 +58,7 @@ def getpsf(npix, psfwidth, ell=0.2, pa=0):
 
     Parameters:
     ----------
-    
+
     npix: int
         Size of the PSF cutout
     psfwidth: float
@@ -87,7 +87,7 @@ def getpsf(npix, psfwidth, ell=0.2, pa=0):
 def convolver(grid, psf):
     """
     Convolve a grid of models with the psf
-    
+
     Parameters:
     -----------
     grid: numpy array
@@ -117,7 +117,7 @@ def evaluator_c(ima, var, grid):
     var: numpy
         2-D variance image
     grid: numpy
-        The 3-D grid of models with the size (.,npix,npix) where 
+        The 3-D grid of models with the size (.,npix,npix) where
         npix is the size of the image
 
     Returns:
@@ -159,7 +159,7 @@ def evaluator(ima, var, mgrid):
     var: numpy
         2-D variance image
     grid: numpy
-        The 3-D grid of models with the size (.,npix,npix) where 
+        The 3-D grid of models with the size (.,npix,npix) where
         npix is the size of the image
 
     Returns:
@@ -179,11 +179,11 @@ def evaluator(ima, var, mgrid):
 def sg_prob(ima, var, psf, grid, lgal_prior, get_grid=False):
     """
     Compute the log-odds of star/galaxy given an image and galaxy model grid
-    
+
     Parameters:
     -----------
     ima: numpy array
-        2-D input image 
+        2-D input image
     var: numpy array
         2-D variance image
     psf: numpy array
@@ -194,14 +194,14 @@ def sg_prob(ima, var, psf, grid, lgal_prior, get_grid=False):
         1-D array of log-priors of galaxy models
     get_grid: bool
         flag that tells whether to return the log(P(D|star))-log(P(D|gal)) scalar
-        values (when get_grid is False) or to return 
+        values (when get_grid is False) or to return
         log(P(D|star)) and a grid of {log(P(D|gal_i))}
 
     Returns:
     --------
     ret: tuple or scalar
         The log(P(D|star)-log(P(D|gal)) if get_grid=False or
-        Tuple with (log(P(D|star)) and numpy array of log(P(D|gal_i)) over 
+        Tuple with (log(P(D|star)) and numpy array of log(P(D|gal_i)) over
         the grid of galaxy mdels
     """
     llikes_g = evaluator_c(ima, var, grid)
@@ -259,19 +259,21 @@ def genima(npix, psf, sn=10, pbstar=0.5, sigell=0.2, nima=1):
     return model1, noise**2, star, rad, n
 
 
-def dohierarch(logl_star, logl_gal):
+def dohierarch(logl_star, logl_gal, verbose=False):
     """
     Perform hierarchical inference, given the log-likelihoods
-    
+
     Parameters:
     -----------
-    
+
     logl_star: numpy array
         1-D array of likelihood of stellar models {log(P(D_i|star))}
     logl_gal: numpy array
         2-D array of likelihoods of galactic models log(P(D_i|gal_j))
         The dimensions of the array are (n_data, n_galaxy_models)
-    
+    verbose: bool
+        print the intermediate results
+
     Returns:
     --------
     ret: tuple
@@ -286,7 +288,8 @@ def dohierarch(logl_star, logl_gal):
     ret = scipy.optimize.minimize(
         like, p0, method='L-BFGS-B', jac=True, args=(dat, -1))
     retx = ret['x']
-    print(ret)
+    if verbose:
+        print(ret)
     pstar = np.exp(retx[0]-np.logaddexp(retx[0], retx[1]))
     pgals = np.exp(retx[2:]-scipy.special.logsumexp(retx[2:]))
     return pstar, pgals
@@ -305,11 +308,11 @@ def like(p, dat, mult=-1):
         p[2:] -- unnormalized log(P(gal_i))
     dat: tuple
         Tuple with the grid of stellar likelihoods (1D numpy array),
-        and grid galaxy likelihoods (2D numpy array) with shape (n_data, n_gal_models) 
+        and grid galaxy likelihoods (2D numpy array) with shape (n_data, n_gal_models)
     mult: float
         Multiplier of likelihood (to switch from maximization to minimization)
-    
-    Returns: 
+
+    Returns:
     --------
     ret: tuple
         Tuple with likelihood value and gradient vector over parameters
@@ -410,7 +413,7 @@ def cutter(ima, var, x, y, npix):
     Parameters:
     -----------
     ima: numpy
-        2-D input image 
+        2-D input image
     var: numpy
         2-D input image
     x: float
@@ -454,7 +457,7 @@ def zeropad(psf, npix):
 def fitextractions(grid, lprior, D, psf, get_grid=False, benchmark=False):
     """
     Fit the extracted cutouts and return either logodds or likelihood grid
-    
+
     Parameters:
     -----------
     grid: numpy array
@@ -463,17 +466,17 @@ def fitextractions(grid, lprior, D, psf, get_grid=False, benchmark=False):
         The 1-D array of log-priors of galaxy models
     D: list of data
         The list of dictionaries with the data.
-        Each dictionary must have keys 'cutout', 'var', 'x','y' 
-        corresponding to the image, variance image and center of 
+        Each dictionary must have keys 'cutout', 'var', 'x','y'
+        corresponding to the image, variance image and center of
         the object
     psf: numpy array
         The 2-D PSF
     get_grid: bool
-        flag to switch between log-odds S/G vs 
+        flag to switch between log-odds S/G vs
         grid of likelihoods of stars and galactic models
     benchmark: bool
         turn on benchmarking, measure average time taken per source
-    
+
     Returns:
     --------
     ret: tuple of arrays or numpy array
@@ -486,26 +489,26 @@ def fitextractions(grid, lprior, D, psf, get_grid=False, benchmark=False):
     """
     if benchmark:
         import time
-    
+
     npix = grid.shape[2]
     grid1 = convolver(grid, psf)
     ret = []
     psfpad = zeropad(psf, npix)
-    
+
     if benchmark:
         start = time.time()
-    
+
     for j in range(len(D)):
         curd = D[j]
         ima, var = cutter(curd['cutout'], curd['var'],
                           curd['x'], curd['y'], npix)
         logodds = sg_prob(ima, var, psfpad, grid1, lprior, get_grid=get_grid)
         ret.append(logodds)
-    
+
     if benchmark:
         end = time.time()
         print("%.2fms per source" % (((end - start)/len(D))*1000))
-    
+
     if get_grid:
         logstar = [_[0] for _ in ret]
         loggal = [_[1] for _ in ret]
