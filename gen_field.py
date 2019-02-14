@@ -30,6 +30,10 @@ def gen_field(output_array_edge=4096,  # pixels
               pixel_scale=0.3,  # arcsec/pixel
               sample_ratio=2.0,  # simulated sky resolution to detector resolution ratio
               star_fraction=0.6,  # fraction of sources that are stars
+              min_sersic = 1, # min sersic index
+              max_sersic = 4, # max sersic index
+              mean_r = 0.4, # mean of galaxy size distribution
+              std_r = 0.4, # standard deviation of galaxy size distribution
               sources_per_axis=40,  # number of sources per axis
               seeing=1,  # arcseconds
               background_level=100,  # counts
@@ -86,16 +90,14 @@ def gen_field(output_array_edge=4096,  # pixels
     galaxies = np.random.uniform(0, 1, size=source_count) > star_fraction
     stars = ~galaxies
 
-    minsersic = 1
-    maxsersic = 4
     # add galaxy sersic indices
     galaxy_count = galaxies.sum()
     source_list['n'][galaxies] = np.random.uniform(
-        minsersic, maxsersic, size=galaxy_count)
+        min_sersic, max_sersic, size=galaxy_count)
 
     # add galaxy sizes
     source_list['size'][galaxies] = 10**np.random.normal(
-        0.4, 0.4, size=galaxy_count)
+        mean_r, std_r, size=galaxy_count)
 
     ### add stars to sky ###
     Xs = (source_list['X'][stars]).astype(np.int)
@@ -112,7 +114,7 @@ def gen_field(output_array_edge=4096,  # pixels
         n = source['n']
         bn = 2 * n - 1./3 + 4./405/n+46./25515/n**2 + 131./1148175/n**3
         # ciotti bertin
-        
+
         #Ie = curi / (2 * np.pi * n * Re**2 * np.exp(bn))*bn**(2*n) / \
         #     scipy.special.gammainc(2*n, bn*(Rap/curs)**(1./n))
         # http://ned.ipac.caltech.edu/level5/March05/Graham/Graham2.html
