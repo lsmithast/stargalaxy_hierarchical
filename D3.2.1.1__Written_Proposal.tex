@@ -1,0 +1,30 @@
+
+\documentclass[a4paper]{article}
+
+%% Language and font encodings
+\usepackage[english]{babel}
+\usepackage[utf8x]{inputenc}
+\usepackage[T1]{fontenc}
+
+%% Sets page size and margins
+\usepackage[a4paper,top=3cm,bottom=2cm,left=3cm,right=3cm,marginparwidth=1.75cm]{geometry}
+
+%% Useful packages
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage[colorinlistoftodos]{todonotes}
+\usepackage[colorlinks=true, allcolors=blue]{hyperref}
+
+\title{Star Galaxy Separation: Abstract}
+\author{V. Belokurov, N.W. Evans, S. Koposov, L.Smith}
+
+\begin{document}
+\maketitle
+
+A critical component of photometric surveys like the Sloan Digital Sky Survey (SDSS) and the Large Synoptic Survey Telescope (LSST) is star/galaxy separation. At faint magnitudes, the separation between point-like and extended sources is fuzzy, which makes star/galaxy separation an awkward task. This problem is even harder for enormous surveys like the LSST due to their huge data volume. In SDSS, the photometric pipeline performs a morphological star/galaxy separation, using a diagnostic like the difference between the psfMag (obtained by fitiing PSF model) and cmodelMag (obtained from best-fitting exponential or de Vaucouleurs profile)
+The quality of this separation is obviously related to the seeing and sky brightness.
+
+Automated classification methods have also been used to solve star/galaxy separation at faint magnitudes. For example, in Sextractor (Bertin \& Anouts 1996), star/galaxy separation is achieved on most images using a neural network trained with simulated images. Recent years have seen increasing efforts in applying machine learning methods as distinct as artificial neural networks (e.g., Support Vector Machines, Random Forests). We plan to devise a new star/galaxy classifier that has the following three desirables: (i) Calibrated star/galaxy probabilities that match the actual frequencies, (ii) the ability to include priors (i.e. priors on colour/magnitude, on right ascension and declination), (iii) the ability to deal with repeated exposures of variable quality.
+
+
+\end{document}
